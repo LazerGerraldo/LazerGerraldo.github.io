@@ -1,52 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extended Family Whereabouts Map</title>
+    <title>Global Traveler Map</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
     <style>
-        :root {
-            --bg-color: #f5f5f5;
-            --sidebar-bg: white;
-            --header-bg: #2c3e50;
-            --header-color: white;
-            --text-color: #333;
-            --card-bg: #f9f9f9;
-            --input-border: #ddd;
-            --input-bg: white;
-            --primary-btn: #3498db;
-            --primary-btn-hover: #2980b9;
-            --danger-btn: #e74c3c;
-            --danger-btn-hover: #c0392b;
-            --success-btn: #2ecc71;
-            --success-btn-hover: #27ae60;
-            --edit-btn: #f39c12;
-            --edit-btn-hover: #d35400;
-            --shadow-color: rgba(0,0,0,0.1);
-        }
-        
-        [data-theme="dark"] {
-            --bg-color: #1a1a1a;
-            --sidebar-bg: #2c2c2c;
-            --header-bg: #1c2834;
-            --header-color: #f0f0f0;
-            --text-color: #f0f0f0;
-            --card-bg: #3c3c3c;
-            --input-border: #555;
-            --input-bg: #444;
-            --primary-btn: #2980b9;
-            --primary-btn-hover: #3498db;
-            --danger-btn: #c0392b;
-            --danger-btn-hover: #e74c3c;
-            --success-btn: #27ae60;
-            --success-btn-hover: #2ecc71;
-            --edit-btn: #d35400;
-            --edit-btn-hover: #f39c12;
-            --shadow-color: rgba(0,0,0,0.4);
-        }
-        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -54,14 +14,12 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            transition: background-color 0.3s, color 0.3s;
+            background-color: #f5f5f5;
         }
         
         header {
-            background-color: var(--header-bg);
-            color: var(--header-color);
+            background-color: #2c3e50;
+            color: white;
             padding: 1rem;
             text-align: center;
         }
@@ -74,13 +32,12 @@
         
         .sidebar {
             width: 300px;
-            background-color: var(--sidebar-bg);
+            background-color: white;
             padding: 1rem;
-            box-shadow: 2px 0 5px var(--shadow-color);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            transition: background-color 0.3s;
         }
         
         .map-container {
@@ -104,17 +61,15 @@
             font-weight: bold;
         }
         
-        input, select, textarea {
+        input, select {
             width: 100%;
             padding: 0.5rem;
-            border: 1px solid var(--input-border);
+            border: 1px solid #ddd;
             border-radius: 4px;
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            transition: background-color 0.3s, border 0.3s, color 0.3s;
         }
         
         button {
+            background-color: #3498db;
             color: white;
             border: none;
             padding: 0.5rem 1rem;
@@ -124,36 +79,8 @@
             transition: background-color 0.3s;
         }
         
-        .primary-btn {
-            background-color: var(--primary-btn);
-        }
-        
-        .primary-btn:hover {
-            background-color: var(--primary-btn-hover);
-        }
-        
-        .danger-btn {
-            background-color: var(--danger-btn);
-        }
-        
-        .danger-btn:hover {
-            background-color: var(--danger-btn-hover);
-        }
-        
-        .success-btn {
-            background-color: var(--success-btn);
-        }
-        
-        .success-btn:hover {
-            background-color: var(--success-btn-hover);
-        }
-        
-        .edit-btn {
-            background-color: var(--edit-btn);
-        }
-        
-        .edit-btn:hover {
-            background-color: var(--edit-btn-hover);
+        button:hover {
+            background-color: #2980b9;
         }
         
         .entry-list {
@@ -163,12 +90,11 @@
         }
         
         .entry-card {
-            background-color: var(--card-bg);
+            background-color: #f9f9f9;
             border-radius: 4px;
             padding: 0.5rem;
             margin-bottom: 0.5rem;
             position: relative;
-            transition: background-color 0.3s;
         }
         
         .entry-card h3 {
@@ -181,15 +107,11 @@
             font-size: 0.9rem;
         }
         
-        .card-buttons {
+        .delete-btn {
             position: absolute;
             top: 0.5rem;
             right: 0.5rem;
-            display: flex;
-            gap: 5px;
-        }
-        
-        .card-btn {
+            background-color: #e74c3c;
             color: white;
             border: none;
             width: 24px;
@@ -200,28 +122,14 @@
             justify-content: center;
             cursor: pointer;
             font-size: 12px;
-            padding: 0;
-            margin: 0;
+        }
+        
+        .delete-btn:hover {
+            background-color: #c0392b;
         }
         
         .search-container {
             margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-        }
-        
-        .search-container input {
-            flex: 1;
-        }
-        
-        .toggle-theme {
-            margin-left: 10px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.2rem;
-            padding: 5px;
-            color: var(--text-color);
         }
         
         .toggle-sidebar {
@@ -230,86 +138,47 @@
             top: 10px;
             left: 10px;
             z-index: 1000;
-            background-color: var(--sidebar-bg);
-            color: var(--text-color);
+            background-color: white;
             border: none;
             border-radius: 4px;
             padding: 0.5rem;
-            box-shadow: 0 2px 5px var(--shadow-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
         /* Location suggestions */
         .location-suggestions {
             position: absolute;
             width: 100%;
-            background-color: var(--input-bg);
-            border: 1px solid var(--input-border);
+            background-color: white;
+            border: 1px solid #ddd;
             border-top: none;
             border-radius: 0 0 4px 4px;
             max-height: 200px;
             overflow-y: auto;
             z-index: 1000;
-            box-shadow: 0 4px 6px var(--shadow-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             display: none;
         }
         
         .suggestion-item {
             padding: 8px 12px;
             cursor: pointer;
-            color: var(--text-color);
         }
         
         .suggestion-item:hover {
-            background-color: var(--card-bg);
+            background-color: #f0f0f0;
         }
         
         .location-details {
             font-size: 0.8rem;
-            color: var(--text-color);
-            opacity: 0.7;
+            color: #666;
             margin-top: 4px;
         }
         
         .coordinates-display {
             font-size: 0.8rem;
-            color: var(--text-color);
-            opacity: 0.7;
+            color: #666;
             margin-top: 4px;
-        }
-        
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            background-color: var(--sidebar-bg);
-            padding: 20px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 4px 8px var(--shadow-color);
-        }
-        
-        .modal-title {
-            margin-top: 0;
-            margin-bottom: 20px;
-        }
-        
-        .modal-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
         }
         
         @media (max-width: 768px) {
@@ -334,21 +203,19 @@
 </head>
 <body>
     <header>
-        <h1>Extended Family Whereabouts Map</h1>
-        <p>Helping you keep track of your numerous extended family members all around the world.</p>
+        <h1>Global Traveler Map</h1>
+        <p>Track your global adventures and connections</p>
     </header>
     
     <div class="container">
-        <button class="toggle-sidebar primary-btn">☰</button>
+        <button class="toggle-sidebar">☰</button>
         
         <div class="sidebar">
             <div class="search-container">
                 <input type="text" id="search-input" placeholder="Search entries...">
-                <button class="toggle-theme" id="theme-toggle">🌙</button>
             </div>
             
             <form id="location-form">
-                <input type="hidden" id="edit-id" value="">
                 <div class="form-group">
                     <label for="person-name">Person's Name</label>
                     <input type="text" id="person-name" required>
@@ -368,15 +235,13 @@
                 
                 <div class="form-group">
                     <label for="notes">Additional Notes</label>
-                    <textarea id="notes" placeholder="Optional notes" rows="3"></textarea>
+                    <input type="text" id="notes" placeholder="Optional notes">
                 </div>
                 
-                <div id="form-buttons">
-                    <button type="submit" class="primary-btn" id="add-button">Add to Map</button>
-                </div>
+                <button type="submit">Add to Map</button>
             </form>
             
-            <h2>Family Members</h2>
+            <h2>Entries</h2>
             <div class="entry-list" id="entry-list">
                 <!-- Entries will be added dynamically -->
             </div>
@@ -386,88 +251,25 @@
             <div id="map"></div>
         </div>
     </div>
-    
-    <!-- Edit Confirmation Modal -->
-    <div id="edit-modal" class="modal">
-        <div class="modal-content">
-            <h3 class="modal-title">Edit Family Member Location</h3>
-            <p>Update the information for this family member?</p>
-            <div class="modal-buttons">
-                <button id="cancel-edit" class="danger-btn">Cancel</button>
-                <button id="confirm-edit" class="success-btn">Save Changes</button>
-            </div>
-        </div>
-    </div>
 
     <script>
-        // Theme management
-        const themeToggle = document.getElementById('theme-toggle');
-        let currentTheme = localStorage.getItem('theme') || 'light';
-        
-        // Set initial theme
-        document.documentElement.setAttribute('data-theme', currentTheme);
-        updateThemeIcon();
-        
-        themeToggle.addEventListener('click', function() {
-            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', currentTheme);
-            localStorage.setItem('theme', currentTheme);
-            updateThemeIcon();
-            updateMapTheme();
-        });
-        
-        function updateThemeIcon() {
-            themeToggle.textContent = currentTheme === 'light' ? '🌙' : '☀️';
-        }
-        
         // Initialize the map
         const map = L.map('map').setView([20, 0], 2);
-        let tileLayer;
         
-        function initMap() {
-            // Add tile layer (OpenStreetMap)
-            tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-            
-            updateMapTheme();
-        }
-        
-        function updateMapTheme() {
-            // Remove existing tile layer
-            if (tileLayer) {
-                map.removeLayer(tileLayer);
-            }
-            
-            // Add appropriate tile layer based on theme
-            if (currentTheme === 'dark') {
-                tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                }).addTo(map);
-            } else {
-                tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
-            }
-        }
-        
-        initMap();
+        // Add tile layer (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
         
         // Store markers and entries
         const markers = [];
         const entries = [];
         let selectedLocation = null;
-        let isEditMode = false;
         
         // Setup location input with autocomplete
         const locationInput = document.getElementById('location');
         const suggestionsContainer = document.getElementById('location-suggestions');
         const coordinatesDisplay = document.getElementById('coordinates-display');
-        const editIdInput = document.getElementById('edit-id');
-        const addButton = document.getElementById('add-button');
-        const editModal = document.getElementById('edit-modal');
-        const cancelEditBtn = document.getElementById('cancel-edit');
-        const confirmEditBtn = document.getElementById('confirm-edit');
         
         // Event listener for location input
         locationInput.addEventListener('input', debounce(function() {
@@ -488,18 +290,6 @@
             if (e.target !== locationInput && e.target !== suggestionsContainer) {
                 suggestionsContainer.style.display = 'none';
             }
-        });
-        
-        // Cancel edit button
-        cancelEditBtn.addEventListener('click', function() {
-            editModal.style.display = 'none';
-            resetForm();
-        });
-        
-        // Confirm edit button
-        confirmEditBtn.addEventListener('click', function() {
-            editModal.style.display = 'none';
-            submitEdit();
         });
         
         // Fetch location suggestions from Nominatim API
@@ -600,58 +390,22 @@
             const arrivalDate = document.getElementById('arrival-date').value;
             const notes = document.getElementById('notes').value;
             
-            if (isEditMode) {
-                // Show confirmation modal
-                editModal.style.display = 'flex';
-                return;
-            }
-            
             if (selectedLocation) {
                 // Use the coordinates from the selected location
                 addEntry(personName, selectedLocation.name, arrivalDate, notes, selectedLocation.coords);
-                resetForm();
+                clearForm();
             } else {
                 // Geocode the location if no suggestion was selected
                 geocodeLocation(location, function(coords) {
                     if (coords) {
                         addEntry(personName, location, arrivalDate, notes, coords);
-                        resetForm();
+                        clearForm();
                     } else {
                         alert('Could not find coordinates for the specified location. Please select a location from the suggestions.');
                     }
                 });
             }
         });
-        
-        // Submit the edit
-        function submitEdit() {
-            const id = editIdInput.value;
-            const personName = document.getElementById('person-name').value;
-            const location = document.getElementById('location').value;
-            const arrivalDate = document.getElementById('arrival-date').value;
-            const notes = document.getElementById('notes').value;
-            
-            if (selectedLocation) {
-                updateEntry(id, personName, selectedLocation.name, arrivalDate, notes, selectedLocation.coords);
-            } else {
-                // Try to use existing coordinates if location name hasn't changed
-                const existingEntry = entries.find(e => e.id === id);
-                if (existingEntry && existingEntry.location === location) {
-                    updateEntry(id, personName, location, arrivalDate, notes, existingEntry.coords);
-                } else {
-                    // Geocode the location if it has changed
-                    geocodeLocation(location, function(coords) {
-                        if (coords) {
-                            updateEntry(id, personName, location, arrivalDate, notes, coords);
-                        } else {
-                            alert('Could not find coordinates for the specified location. Please select a location from the suggestions.');
-                        }
-                    });
-                }
-            }
-            
-            resetForm();
-        }
         
         // Geocode location if no suggestion was selected
         function geocodeLocation(locationStr, callback) {
@@ -734,69 +488,6 @@
             map.setView([coords.lat, coords.lng], 5);
         }
         
-        // Update an existing entry
-        function updateEntry(id, name, location, date, notes, coords) {
-            // Find the entry in the array
-            const entryIndex = entries.findIndex(e => e.id === id);
-            if (entryIndex === -1) return;
-            
-            // Update entry data
-            entries[entryIndex] = {
-                id,
-                name,
-                location,
-                date,
-                notes,
-                coords
-            };
-            
-            // Update the marker
-            const markerIndex = markers.findIndex(m => m.entryId === id);
-            if (markerIndex !== -1) {
-                // Remove old marker
-                map.removeLayer(markers[markerIndex]);
-                
-                // Create new marker
-                const marker = L.marker([coords.lat, coords.lng]).addTo(map);
-                marker.entryId = id;
-                
-                // Create popup content
-                const popupContent = `
-                    <strong>${name}</strong><br>
-                    Location: ${location}<br>
-                    Arrived: ${formatDate(date)}
-                    ${notes ? `<br>Notes: ${notes}` : ''}
-                `;
-                
-                marker.bindPopup(popupContent);
-                markers[markerIndex] = marker;
-                
-                // Center the map on the updated marker
-                map.setView([coords.lat, coords.lng], 5);
-            }
-            
-            // Update sidebar entry
-            const entryCard = document.querySelector(`.entry-card[data-id="${id}"]`);
-            if (entryCard) {
-                entryCard.innerHTML = `
-                    <h3>${name}</h3>
-                    <p><strong>Location:</strong> ${location}</p>
-                    <p><strong>Arrived:</strong> ${formatDate(date)}</p>
-                    ${notes ? `<p><strong>Notes:</strong> ${notes}</p>` : ''}
-                    <div class="card-buttons">
-                        <button class="card-btn edit-btn">✎</button>
-                        <button class="card-btn danger-btn">✕</button>
-                    </div>
-                `;
-                
-                // Re-add event listeners
-                addEntryCardListeners(entryCard, entries[entryIndex]);
-            }
-            
-            // Save to localStorage
-            saveEntries();
-        }
-        
         // Add entry to the sidebar list
         function addEntryToList(entry) {
             const entryList = document.getElementById('entry-list');
@@ -810,22 +501,12 @@
                 <p><strong>Location:</strong> ${entry.location}</p>
                 <p><strong>Arrived:</strong> ${formatDate(entry.date)}</p>
                 ${entry.notes ? `<p><strong>Notes:</strong> ${entry.notes}</p>` : ''}
-                <div class="card-buttons">
-                    <button class="card-btn edit-btn">✎</button>
-                    <button class="card-btn danger-btn">✕</button>
-                </div>
+                <button class="delete-btn">✕</button>
             `;
             
-            addEntryCardListeners(entryCard, entry);
-            
-            entryList.appendChild(entryCard);
-        }
-        
-        // Add event listeners to entry card
-        function addEntryCardListeners(card, entry) {
-            // Click on card to focus map
-            card.addEventListener('click', function(e) {
-                if (!e.target.classList.contains('card-btn')) {
+            // Add click event to highlight on map
+            entryCard.addEventListener('click', function(e) {
+                if (e.target.className !== 'delete-btn') {
                     // Find the marker
                     const marker = markers.find(m => m.entryId === entry.id);
                     if (marker) {
@@ -835,24 +516,113 @@
                 }
             });
             
-            // Edit button handler
-            card.querySelector('.edit-btn').addEventListener('click', function(e) {
-                e.stopPropagation();
-                loadEntryForEdit(entry.id);
-            });
-            
-            // Delete button handler
-            card.querySelector('.danger-btn').addEventListener('click', function(e) {
-                e.stopPropagation();
+            // Add delete button handler
+            entryCard.querySelector('.delete-btn').addEventListener('click', function() {
                 removeEntry(entry.id);
             });
+            
+            entryList.appendChild(entryCard);
         }
         
-        // Load entry data into form for editing
-        function loadEntryForEdit(id) {
-            const entry = entries.find(e => e.id === id);
-            if (!entry) return;
+        // Remove entry and marker
+        function removeEntry(id) {
+            // Remove marker from map
+            const markerIndex = markers.findIndex(m => m.entryId === id);
+            if (markerIndex !== -1) {
+                map.removeLayer(markers[markerIndex]);
+                markers.splice(markerIndex, 1);
+            }
             
-            // Set form fields
-            document.getElementById('person-name').value = entry.name;
-            document.getElementById('location').value
+            // Remove from entries array
+            const entryIndex = entries.findIndex(e => e.id === id);
+            if (entryIndex !== -1) {
+                entries.splice(entryIndex, 1);
+            }
+            
+            // Remove from list
+            const entryCard = document.querySelector(`.entry-card[data-id="${id}"]`);
+            if (entryCard) {
+                entryCard.remove();
+            }
+            
+            // Save to localStorage
+            saveEntries();
+        }
+        
+        // Clear the form
+        function clearForm() {
+            document.getElementById('person-name').value = '';
+            document.getElementById('location').value = '';
+            document.getElementById('notes').value = '';
+            selectedLocation = null;
+            coordinatesDisplay.textContent = '';
+            // Keep the date as is for convenience
+        }
+        
+        // Format date for display
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString();
+        }
+        
+        // Save entries to localStorage
+        function saveEntries() {
+            localStorage.setItem('mapEntries', JSON.stringify(entries));
+        }
+        
+        // Load entries from localStorage
+        function loadEntries() {
+            const savedEntries = localStorage.getItem('mapEntries');
+            if (savedEntries) {
+                const parsedEntries = JSON.parse(savedEntries);
+                parsedEntries.forEach(entry => {
+                    addEntry(entry.name, entry.location, entry.date, entry.notes, entry.coords);
+                });
+            }
+        }
+        
+        // Handle search functionality
+        document.getElementById('search-input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            document.querySelectorAll('.entry-card').forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+        
+        // Handle sidebar toggle for mobile
+        document.querySelector('.toggle-sidebar').addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('collapsed');
+        });
+        
+        // Debounce function to limit API calls
+        function debounce(func, wait) {
+            let timeout;
+            return function() {
+                const context = this;
+                const args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    func.apply(context, args);
+                }, wait);
+            };
+        }
+        
+        // Load saved entries when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('arrival-date').value = today;
+            
+            // Load saved entries
+            loadEntries();
+        });
+    </script>
+</body>
+</html>
