@@ -203,7 +203,7 @@
 </head>
 <body>
     <header>
-        <h1>Global Traveler Map</h1>
+        <h1>Extended Family Whereabouts Map</h1>
         <p>Helping you keep track of your numerous extended family members all around the world.</p>
     </header>
     
