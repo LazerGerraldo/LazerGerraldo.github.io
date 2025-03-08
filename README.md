@@ -52,6 +52,7 @@
         
         .form-group {
             margin-bottom: 1rem;
+            position: relative;
         }
         
         label {
@@ -144,6 +145,42 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
+        /* Location suggestions */
+        .location-suggestions {
+            position: absolute;
+            width: 100%;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .suggestion-item {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .location-details {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .coordinates-display {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 4px;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
@@ -186,7 +223,9 @@
                 
                 <div class="form-group">
                     <label for="location">Location</label>
-                    <input type="text" id="location" placeholder="City, Country" required>
+                    <input type="text" id="location" placeholder="Start typing a city name..." required autocomplete="off">
+                    <div id="location-suggestions" class="location-suggestions"></div>
+                    <div id="coordinates-display" class="coordinates-display"></div>
                 </div>
                 
                 <div class="form-group">
@@ -225,6 +264,122 @@
         // Store markers and entries
         const markers = [];
         const entries = [];
+        let selectedLocation = null;
+        
+        // Setup location input with autocomplete
+        const locationInput = document.getElementById('location');
+        const suggestionsContainer = document.getElementById('location-suggestions');
+        const coordinatesDisplay = document.getElementById('coordinates-display');
+        
+        // Event listener for location input
+        locationInput.addEventListener('input', debounce(function() {
+            const query = locationInput.value.trim();
+            if (query.length < 3) {
+                suggestionsContainer.style.display = 'none';
+                selectedLocation = null;
+                coordinatesDisplay.textContent = '';
+                return;
+            }
+            
+            // Use Nominatim API to search for locations
+            fetchLocationSuggestions(query);
+        }, 300));
+        
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target !== locationInput && e.target !== suggestionsContainer) {
+                suggestionsContainer.style.display = 'none';
+            }
+        });
+        
+        // Fetch location suggestions from Nominatim API
+        async function fetchLocationSuggestions(query) {
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+                displaySuggestions(data);
+            } catch (error) {
+                console.error('Error fetching location suggestions:', error);
+                // Fall back to simulated suggestions
+                const simulatedResults = generateSimulatedResults(query);
+                displaySuggestions(simulatedResults);
+            }
+        }
+        
+        // Generate simulated results (backup if the API is unavailable)
+        function generateSimulatedResults(query) {
+            // List of major cities for demonstration
+            const cities = [
+                { name: 'New York', country: 'United States', lat: 40.7128, lon: -74.0060 },
+                { name: 'London', country: 'United Kingdom', lat: 51.5074, lon: -0.1278 },
+                { name: 'Paris', country: 'France', lat: 48.8566, lon: 2.3522 },
+                { name: 'Tokyo', country: 'Japan', lat: 35.6762, lon: 139.6503 },
+                { name: 'Sydney', country: 'Australia', lat: -33.8688, lon: 151.2093 },
+                { name: 'Rio de Janeiro', country: 'Brazil', lat: -22.9068, lon: -43.1729 },
+                { name: 'Cairo', country: 'Egypt', lat: 30.0444, lon: 31.2357 },
+                { name: 'Mumbai', country: 'India', lat: 19.0760, lon: 72.8777 },
+                { name: 'Beijing', country: 'China', lat: 39.9042, lon: 116.4074 },
+                { name: 'Los Angeles', country: 'United States', lat: 34.0522, lon: -118.2437 },
+                { name: 'Chicago', country: 'United States', lat: 41.8781, lon: -87.6298 },
+                { name: 'Toronto', country: 'Canada', lat: 43.6532, lon: -79.3832 },
+                { name: 'Berlin', country: 'Germany', lat: 52.5200, lon: 13.4050 },
+                { name: 'Moscow', country: 'Russia', lat: 55.7558, lon: 37.6173 },
+                { name: 'Singapore', country: 'Singapore', lat: 1.3521, lon: 103.8198 }
+            ];
+            
+            // Filter cities that match the query
+            const lowerQuery = query.toLowerCase();
+            const filtered = cities.filter(city => 
+                city.name.toLowerCase().includes(lowerQuery) || 
+                city.country.toLowerCase().includes(lowerQuery)
+            );
+            
+            // Format the results to match Nominatim API response structure
+            return filtered.map(city => ({
+                display_name: `${city.name}, ${city.country}`,
+                lat: city.lat,
+                lon: city.lon
+            }));
+        }
+        
+        // Display suggestions in the dropdown
+        function displaySuggestions(suggestions) {
+            if (suggestions.length === 0) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+            
+            // Clear previous suggestions
+            suggestionsContainer.innerHTML = '';
+            
+            // Add new suggestions
+            suggestions.forEach(place => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.textContent = place.display_name;
+                
+                item.addEventListener('click', function() {
+                    locationInput.value = place.display_name;
+                    selectedLocation = {
+                        name: place.display_name,
+                        coords: { lat: parseFloat(place.lat), lng: parseFloat(place.lon) }
+                    };
+                    
+                    // Show coordinates
+                    coordinatesDisplay.textContent = `Coordinates: ${place.lat}, ${place.lon}`;
+                    
+                    // Hide suggestions
+                    suggestionsContainer.style.display = 'none';
+                });
+                
+                suggestionsContainer.appendChild(item);
+            });
+            
+            // Show suggestions
+            suggestionsContainer.style.display = 'block';
+        }
         
         // Form submission handler
         document.getElementById('location-form').addEventListener('submit', function(e) {
@@ -235,23 +390,48 @@
             const arrivalDate = document.getElementById('arrival-date').value;
             const notes = document.getElementById('notes').value;
             
-            // Geocode the location (in a real app, you'd use a geocoding service)
-            // For this demo, we'll simulate geocoding with random coordinates near the equator
-            geocodeLocation(location, function(coords) {
-                if (coords) {
-                    addEntry(personName, location, arrivalDate, notes, coords);
-                    clearForm();
-                } else {
-                    alert('Could not find coordinates for the specified location.');
-                }
-            });
+            if (selectedLocation) {
+                // Use the coordinates from the selected location
+                addEntry(personName, selectedLocation.name, arrivalDate, notes, selectedLocation.coords);
+                clearForm();
+            } else {
+                // Geocode the location if no suggestion was selected
+                geocodeLocation(location, function(coords) {
+                    if (coords) {
+                        addEntry(personName, location, arrivalDate, notes, coords);
+                        clearForm();
+                    } else {
+                        alert('Could not find coordinates for the specified location. Please select a location from the suggestions.');
+                    }
+                });
+            }
         });
         
-        // Simulated geocoding function
+        // Geocode location if no suggestion was selected
         function geocodeLocation(locationStr, callback) {
-            // In a real app, you'd use a service like OpenStreetMap Nominatim or Google Geocoding API
-            // For this demo, we'll generate random coordinates based on the location string
-            
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationStr)}&limit=1`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        const coords = {
+                            lat: parseFloat(data[0].lat),
+                            lng: parseFloat(data[0].lon)
+                        };
+                        callback(coords);
+                    } else {
+                        // Fallback to simulated geocoding if API returns no results
+                        fallbackGeocoding(locationStr, callback);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error geocoding location:', error);
+                    // Fallback to simulated geocoding if API fails
+                    fallbackGeocoding(locationStr, callback);
+                });
+        }
+        
+        // Fallback geocoding function
+        function fallbackGeocoding(locationStr, callback) {
             // Generate a simple hash of the location string
             let hash = 0;
             for (let i = 0; i < locationStr.length; i++) {
@@ -303,6 +483,9 @@
             
             // Save to localStorage
             saveEntries();
+            
+            // Center the map on the new marker
+            map.setView([coords.lat, coords.lng], 5);
         }
         
         // Add entry to the sidebar list
@@ -371,6 +554,8 @@
             document.getElementById('person-name').value = '';
             document.getElementById('location').value = '';
             document.getElementById('notes').value = '';
+            selectedLocation = null;
+            coordinatesDisplay.textContent = '';
             // Keep the date as is for convenience
         }
         
@@ -415,6 +600,19 @@
             const sidebar = document.querySelector('.sidebar');
             sidebar.classList.toggle('collapsed');
         });
+        
+        // Debounce function to limit API calls
+        function debounce(func, wait) {
+            let timeout;
+            return function() {
+                const context = this;
+                const args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    func.apply(context, args);
+                }, wait);
+            };
+        }
         
         // Load saved entries when the page loads
         document.addEventListener('DOMContentLoaded', function() {
