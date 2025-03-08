@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Traveler Map</title>
+    <title>Extended Family Whereabouts Map</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
     <style>
@@ -204,7 +204,7 @@
 <body>
     <header>
         <h1>Global Traveler Map</h1>
-        <p>Track your global adventures and connections</p>
+        <p>Helping you keep track of your numerous extended family members all around the world.</p>
     </header>
     
     <div class="container">
